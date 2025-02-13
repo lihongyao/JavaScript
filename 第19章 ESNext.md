@@ -2,9 +2,9 @@ https://developer.aliyun.com/article/700302
 
 # ES6（2015）
 
-## 1. 声明与表达式
+## 声明与表达式
 
-### 1.1. let & const
+### let & const
 
 默认使用 const，只有当确实需要改变变量的值的时候才使用 `let`，这是因为大部分的变量的值在初始化后不应再改变，而预料之外的变量的修改是很多 bug 的源头。
 
@@ -70,11 +70,11 @@ foo();
 2. let & const 不能重复定义
 3. let & const 引起块级作用域
 
-### 1.2. 变量解构
+### 变量解构
 
 ES6 允许按照一定模式，从数组和对象中提取值，对变量进行赋值，这被称为解构。
 
-#### 1.2.1 解构示例
+#### 解构示例
 
 > a）解构数组
 
@@ -116,7 +116,7 @@ console.log(a, b, c, d, e);
 // C H I N A
 ```
 
-#### 1.2.2. 用途
+#### 用途
 
 > a）交换值
 
@@ -157,7 +157,7 @@ const json = {
 const { code, data } = json;
 ```
 
-### 1.3. Symbol
+### Symbol
 
 Symbol 是一种原始数据类型，它的主要作用是创建具有唯一性的标识符。
 
@@ -206,9 +206,9 @@ Symbol 的使用场景包括但不限于以下几个方面：
 
 Symbol 的使用场景主要涉及 **对象属性的唯一性和私有性**，**以及自定义对象行为的扩展性**。通过合理使用 Symbol，可以更好地组织和保护代码，避免命名冲突和属性暴露的问题。
 
-## 2. 内置对象
+## 内置对象
 
-###  2.1. Map & WeakMap（*News*）
+###  Map & WeakMap（*News*）
 
 - Map：[参考这里 >>](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Map)
 - WeakMap：[参考这里 >>](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/WeakMap)
@@ -275,7 +275,7 @@ function objToMap(obj) {
 console.log(objToMap({ name: '张三', job: '前端工程师' }));
 ```
 
-### 2.2. Set & WeakSet（*News*）
+### Set & WeakSet（*News*）
 
 Set 类似于数组，但成员是唯一且无序的，没有重复的值。
 
@@ -312,11 +312,11 @@ Set 类似于数组，但成员是唯一且无序的，没有重复的值。
 
 上述代码中，`[...a]` 表示将 Set 转换为数组，然后再使用数组的方法进行处理。`filter()` 方法用于过滤数组中不符合条件的元素，`has()` 方法用于判断 Set 中是否包含某个元素。最后， `new Set()` 可以将结果转换回 Set。
 
-### 2.3. Proxy & Reflect \*（*News*）
+### Proxy & Reflect \*（*News*）
 
 Proxy 和 Reflect 是 ES6 引入的两个新的内置对象，它们提供了一些强大的功能，可以用于拦截和操作对象的行为。
 
-#### 2.3.1. 基础
+#### 基础
 
 [Proxy >>](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy) 对象用于创建一个对象的代理，从而实现基本操作的拦截和自定义（如属性查找、赋值、枚举、函数调用等）
 
@@ -329,7 +329,7 @@ const p = new Proxy(target, handler)
 - `target`： 要使用 Proxy 包装的目标对象（可以是任何类型的对象，包括原生数组，函数，甚至另一个代理）
 - `handler`：一个通常以函数作为属性的对象，各属性中的函数分别定义了在执行各种操作时代理 `p` 的行为
 
-#### 2.3.2. Handlers(13)
+#### Handlers(13)
 
 Proxy 支持13种拦截方式，如下所示：
 
@@ -462,13 +462,13 @@ const p = new Proxy(formData, {
 });
 ```
 
-#### 2.3.3. Reflect
+#### Reflect
 
 [Reflect >>](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Reflect) 是一个内置的对象，它提供了一组与对象操作相关的方法，这些方法与对应的 Object 方法功能基本相同。Reflect 的方法设计更加合理，使用更加方便，并且可以作为函数直接调用，而不需要通过对象实例来调用。Reflect 方法包括 Reflect.get、Reflect.set、Reflect.has 等。它们可以用于代替 Object 的相关方法，完成对象属性的读取、赋值和判断等操作。
 
 Reflect APIs 和 Proxy APIs 一致，笔者认为，二者的区别可以这么理解， Reflect 是用来操作对象的，Proxy 是用来操作代理的。
 
-#### 2.3.4. 场景
+#### 场景
 
 > **1）私有属性**
 
@@ -543,9 +543,9 @@ person.age = 30;
 
 在上述示例中，`createObservable` 函数返回一个代理对象，当设置属性时会调用 `onChange` 回调函数，并将属性名称和新值作为参数传递给它。该示例仅用于演示目的，实际应用中可能需要更复杂的逻辑来处理观察者列表的添加和删除，以及通知机制的实现。
 
-### 2.4. 字符串
+### 字符串
 
-#### 2.4.1. 模板字符串
+#### 模板字符串
 
 模板字面量（Template Literals）：使用反引号（\`）包围字符串，可以在字符串中插入变量或表达式，通过 `${}` 来引用。这使得字符串拼接更加简洁和可读。
 
@@ -560,7 +560,7 @@ const message = `Hello, ${name}!`;
 >
 > 2、如果使用模板字符串表示多行字符串，所有的空格、缩进和换行都会保留在输出之中。
 
-#### 2.4.2. 新增APIs
+#### 新增APIs
 
 - [String.prototype.includes()](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/String/includes)
 - [String.prototype.startsWith()](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/String/startsWith)
@@ -569,9 +569,9 @@ const message = `Hello, ${name}!`;
 - [String.prototype.padStart()](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/String/padStart)
 - [String.prototype.padEnd()](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/String/padEnd)
 
-### 2.5. 数值
+### 数值
 
-#### 2.5.1. Number 
+#### Number 
 
 - [Number.parseInt()](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Number/parseint)
 - [Number.parseFloat()](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Number/parseFloat)
@@ -579,14 +579,14 @@ const message = `Hello, ${name}!`;
 - [Number.isNaN()](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Number/isNaN)
 - [Number.isInteger()](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Number/isInteger)
 
-#### 2.5.2. Math
+#### Math
 
 - [Math.trunc()](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Math/trunc)：去除小数部分，返回整数部分
 - [Math.sign()](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Math/sign)：判断一个数是正数、负数还是零。
 
-### 2.6. 对象
+### 对象
 
-#### 2.6.1. 属性简写
+#### 属性简写
 
 ```js
 const name = '张三', job = '前端工程师';
@@ -599,7 +599,7 @@ const person = {
 };
 ```
 
-#### 2.6.2. 属性名表达式
+#### 属性名表达式
 
 ```js
 const person = {
@@ -613,12 +613,12 @@ console.log(person.personName);
 person.showName();
 ```
 
-#### 2.6.3. APIs
+#### APIs
 
 - [**`Object.assign()`**](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object/assign)：浅拷贝
 - [**`Object.is()`**](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object/is)：判断两个值是否为[同一个值](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Equality_comparisons_and_sameness)。
 
-### 2.7. 数组
+### 数组
 
 - [**`Array.from()`**](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Array/from)：将类似数组转变为真正的数组；
 - [**`Array.of()`**](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Array/of)：将一组值，转换为数组；
@@ -638,11 +638,11 @@ person.showName();
 - [**`Array.prototype.filter()`**](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Array/filter)：过滤数组元素
 - [**`Array.prototype.reduce()`**](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Array/Reduce)：对数组中的每个元素执行一个由您提供的**reducer**函数(升序执行)，将其结果汇总为单个返回值。
 
-## 3. 运算符与语句
+## 运算符与语句
 
-### 3.1. 函数
+### 函数
 
-#### 3.1.1. 函数参数的扩展
+#### 函数参数的扩展
 
 **默认参数**
 
@@ -666,7 +666,7 @@ console.log(sum(1, 2, 3)); // 6
 console.log(sum(1, 2, 3, 4)); // 10
 ```
 
-#### 3.1.2. 箭头函数
+#### 箭头函数
 
 [Arrow_functions =>](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Functions/Arrow_functions)
 
@@ -706,9 +706,9 @@ ES6允许使用箭头定义函数，其语法形式为：
   - 需要具有命名函数的构造函数
   - 需要使用 arguments 对象的函数
 
-### 3.2. class类
+### class类
 
-#### 3.2.1. 基本语法
+#### 基本语法
 
 ##### 概述
 
@@ -998,13 +998,13 @@ console.log(Object.getPrototypeOf(Student) === Person); // true
 - [**`export`**](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Statements/export)：导出模块
 - [**`import`**](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Statements/import)：导入模块
 
-## 4. 异步编程
+## 异步编程
 
-### 4.1. Promise
+### Promise
 
 Promise 相关面试题 [戳这里 >>](https://juejin.cn/post/6844904077537574919)
 
-#### 4.1.1. 概述
+#### 概述
 
 [Promise](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Promise) 是 js 中处理异步操作的一种机制，它提供了一种更优雅和可靠的方式来处理异步代码。Promise 是一个代表异步操作最终完成或失败的对象，可以通过链式调用来组织和控制异步操作的流程。
 
@@ -1043,7 +1043,7 @@ Promise 的出现使得异步操作的编写和控制更加简洁和可靠，避
 5. **无法直接处理回调函数**：很多现有的库和异步函数仍然使用回调函数的方式来处理异步操作，而 Promise 并不能直接处理这些回调函数，需要通过额外的包装或转换来适应。
 6. **错误堆栈不完整**：当 Promise 链中发生错误时，错误信息只会出现在最后一个 Promise 的错误处理函数中，而不会显示完整的错误堆栈信息，这可能会对错误的追踪和调试造成困扰。
 
-#### 4.1.2. 用法
+#### 用法
 
 语法形式：
 
@@ -1075,7 +1075,7 @@ promise.then(() => {
 
 then方法可以接收两个回调函数作为参数。第一个回调函数是 Promise 对象的状态变为 Fulfilled 时调用，第二个回调函数是Promise对象的状态变为Rejected时调用。其中，第二个函数是可选的，不一定要提供。这两个函数都接受Promise对象传出的值作为参数。
 
-#### 4.1.3. then
+#### then
 
 [**`.then()`**](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Promise/then) 方法返回一个 Pomise，它最多需要有两个参数：Promise 的成功和失败情况的回调函数。语法形式如下：
 
@@ -1162,7 +1162,7 @@ t3
 t3成功后返回的内容！ */
 ```
 
-#### 4.1.4. catch
+#### catch
 
 [**`.catch()`**](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Promise/catch) 方法用于注册一个在 promise 被拒绝时调用的函数。
 
@@ -1176,11 +1176,11 @@ login()
   });
 ```
 
-#### 4.1.5. finally
+#### finally
 
 [**`.finally()`**](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Promise/finally) 方法返回一个 Promise。在 Promise 结束时，无论结果是 fulfilled 或者是 rejected，都会执行指定的回调函数
 
-#### 4.1.6. Promise.all()
+#### Promise.all()
 
 [**`Promise.all()`**](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Promise/all) 包含一组 Promises，并创建一个在所有内容成功完成后执行的 Promise。 您将获得一组结果（即一组 Promise 执行的结果），其顺序与您与传入 Promise 的顺序相同。
 
@@ -1195,7 +1195,7 @@ Promise.all(promises)
   });
 ```
 
-#### 4.1.7. Promise.race()
+#### Promise.race()
 
 [**`Promise.race(iterable)`**](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Promise/race) 方法返回一个 Promise，一旦迭代器中的某个 Promise 成功或失败，返回的 Promise 就会完成。
 
@@ -1210,7 +1210,7 @@ Promise.race(promises)
   });
 ```
 
-### 4.2. [Generator](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Generator) 
+### [Generator](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Generator) 
 
 Generator 函数是 ES6 提供的一种异步编程解决方案，它可以在执行过程中暂停和恢复。Generator 函数通过 `function*` 声明，内部使用 `yield` 关键字来定义暂停点。
 
@@ -1222,7 +1222,7 @@ Generator 函数是 ES6 提供的一种异步编程解决方案，它可以在�
 4. 控制执行流程：可以通过调用 Generator 对象的 `next()` 方法来执行 Generator 函数的代码，并在每次执行到 `yield` 关键字时暂停执行并返回结果。
 5. 恢复执行：通过多次调用 Generator 对象的 `next()` 方法来逐步恢复执行，每次恢复执行都会执行到下一个 `yield` 关键字处，并将 `yield` 表达式的值作为结果返回。
 
-#### 4.2.1. 示例
+#### 示例
 
 > **基础示例**
 
@@ -1301,7 +1301,7 @@ for (const item of iterator) {
 
 # ES7（2016）
 
-## 1. Array.prototype.includes()
+## Array.prototype.includes()
 
 `includes()` 函数用来判断一个数组是否包含一个指定的值，如果包含则返回 `true`，否则返回`false`。
 
@@ -1316,7 +1316,7 @@ ES7 之前，我们通过 `indexOf` 判断，如：
 console.log([1, 2, 3].indexOf(1) !== -1);
 ```
 
-## 2. 指数操作符 `**`
+## 指数操作符 `**`
 
 在 ES7 中引入了指数运算符 `**`，`**` 具有与 `Math.pow(..)` 等效的计算结果。
 
@@ -1326,9 +1326,9 @@ console.log([1, 2, 3].indexOf(1) !== -1);
 
 # ES8（2017）
 
-## 1. `async` / `await`
+## `async` / `await`
 
-### 1.1. 概述
+### 概述
 
 `async` / `await` 是基于 `promise` 的语法糖，它的作用是让异步代码看起来像同步代码 → 方便控制顺序。
 
@@ -1360,7 +1360,7 @@ async function someAsyncFunction() {
 
 需要注意的是，`await` 关键字只能在 `async` 函数内部使用，并且只能等待一个 Promise 对象的解析结果。如果要并行执行多个异步操作，可以使用 `Promise.all()` 或者其他并发控制的方法
 
-### 1.2. async
+### async
 
 我们使用 `async` 关键字，把它放在函数声明之前，使其成为 [async function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function)（异步函数）。
 
@@ -1378,7 +1378,7 @@ console.log(hello()); // → Promise { undefined }
 
 我们可以通过 `then` 来获取异步函数的返回值。
 
-### 1.3. await
+### await
 
 `await` 操作符用于等待一个 `Promise` 对象, 它只能在异步函数 `async function` 内部使用。
 
@@ -1398,7 +1398,7 @@ async function myFirstAsyncFunction() {
 
 如果在函数定义之前使用了 `async` 关键字，就可以在函数内使用 `await`。 当您 `await` 某个 Promise 时，函数暂停执行，直至该 Promise 产生结果，并且暂停并不会阻塞主线程。 如果 Promise 执行，则会返回值。 如果 Promise 拒绝，则会抛出拒绝的值。
 
-### 1.4. 异步函数几种写法
+### 异步函数几种写法
 
 我们已经见识了 `async function() {}`，但 `async` 关键字还可用于其他函数语法：
 
@@ -1444,7 +1444,7 @@ storage.getAvatar('jaffathecake').then(/* ... */);
 
 > 提示：类构造函数以及 getter/settings 方法不能是异步的。
 
-### 1.5. 应用场景
+### 应用场景
 
 > **1）`async/await` 在并发场景中的应用**
 
@@ -1528,7 +1528,7 @@ new Promise(function(resolve, reject) {...} /* executor(执行函数) */ );
 })();
 ```
 
-## 2. `Object.values()`
+## `Object.values()`
 
 `Object.values()` 是一个与 `Object.keys()` 类似的新函数，但返回的是 `Object` 自身属性的所有值，不包括继承的值。
 
@@ -1545,7 +1545,7 @@ console.log(vals); // [ 1, 2, 3 ]
 console.log(Object.values(obj)); // [ 1, 2, 3 ]
 ```
 
-## 3. `Object.entries()`
+## `Object.entries()`
 
 `Object.entries()` 函数返回一个给定对象自身可枚举属性的键值对的数组。
 
@@ -1572,7 +1572,7 @@ for (const [k, v] of Object.entries(obj)) {
  */
 ```
 
-## 4. String padding
+## String padding
 
 在 ES8 中 String 新增了两个实例函数 `String.prototype.padStart` 和 `String.prototype.padEnd`，允许将空字符串或其他字符串添加到原始字符串的开头或结尾。语法形式如下：
 
@@ -1602,7 +1602,7 @@ console.log(`当前时间：${year}-${month}-${day} ${hours}:${minutes}:${second
 
 当月日时分秒在小于10时，我们一般的处理方式是在位数前加一个 `0`，比如秒数是 `2`，那需要将其转换成 `02` 来展示已实现视觉上的统一。这是，通过 `padStart` 方法就可以非常方便的实现啦。
 
-## 5. `Object.getOwnPropertyDescriptors()`
+## `Object.getOwnPropertyDescriptors()`
 
 `Object.getOwnPropertyDescriptors()` 函数用来获取一个对象的所有自身属性的描述符，如果没有任何自身属性，则返回空对象。
 

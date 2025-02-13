@@ -1,83 +1,87 @@
-# 一、概述
+# 概述
 
 > The Browser Object Model(BOM) allows JavaScript to "talk to" the browser.
 
 **BOM**（**B**rowers **O**bject **M**odel，浏览器对象模型）是浏览器为js提供的一个API（**A**pplication **P**rogramming **I**nterface，应用编程接口），所以它不是原生js提供的。通过BOM我们可以访问和设置浏览器的一些属性和函数。
 
-对于BOM的几乎所有操作都依赖于一个全局对象 —— [window](https://developer.mozilla.org/zh-CN/docs/Web/API/Window)。由于它是一个全局对象，所以很多时候在访问它内部的子对象的属性和方法的时候都是可以将window一词省略不写的，如 `window.console.log()`可以直接写成 `console.log()` 也能正常访问。
+BOM 的大部分操作都依赖于全局对象 window，由于它是全局对象，因此访问其子对象的属性和方法时可以省略 window，例如 window.console.log() 可简写为 console.log()。
 
-window 对象下主要包含了以下子对象：
+## window 对象的主要子对象
 
 - **document**：文档对象
-- **frames**：浏览器的框架
-- **history**：浏览器浏览历史对象
-- **location**：浏览器页面所处位置对象
-- **navigator**：浏览器信息导航对象
-- **screen**：浏览器屏幕对象
+- **frames**：浏览器的框架对象
+- **history**：浏览器历史记录对象
+- **location**：当前页面的位置信息
+- **navigator**：浏览器信息对象
+- **screen**：屏幕信息对象
 
-除了这些子对象，window对象还提供了一些方法，如：*alert()*、*open()*、*close()*、*setTimeout()*、*clearTimeout()*、*setIntelval()*、*clearInterval()*等。
+此外，window 还提供了一些常见的方法，例如：
 
-BOM到现在都没有一个组织对其进行标准化，js语法的标准化组织是ECMA，DOM的标准化组织是W3C，但这并不妨碍浏览器厂商们对其的支持。随着Web编程技术的发展，浏览器厂商在很多BOM的内容上都达成了共识，这使得很多没有标准的属性和方法也可以在大多数现代浏览器上正常的使用。
+- alert()、open()、close()
+- setTimeout()、clearTimeout()
+- setInterval()、clearInterval()
 
-在全局环境下，window对象以下几种表示法：
+虽然 BOM 没有官方标准，但随着 Web 发展，各大浏览器厂商已在许多 BOM 相关功能上达成共识，使得大多数现代浏览器都能支持常见的 BOM 操作。
+
+## window 对象的多种表示方式
+
+在全局环境下，以下变量都指向 window：
 
 - **window**
 - **this**
 - **self**
 - **frames**
 
-它们在全局环境下都是指向 `Window` 对象：
+在 Chrome 控制台输入 window.（注意最后的 .），可以查看 window 下的所有属性和方法。由于其包含大量内容，掌握全部并不现实，我们只需了解常用部分即可。
 
-![](./IMGS/bom_window.png)
+# 窗口属性 *
 
-window 对象下的属性和方法非常之多，多至现在也没有一份权威的统计表明window下到底有多少个属性和方法，这个只需要打开Google Chrome（主要推荐，但也可以是其它非IE系列的主流浏览器）的控制台，然后输入“window.”（后面需要加上“点”）就可以看到window下的属性了，而且里面很多属性下还包含二级、三级甚至更多级的属性。也就是说想要完全去掌握window下的所有属性和方法肯定是不现实的，我们只需要掌握一些常用的，对我们实际项目开发中有一定帮助的即可。接下来我们我们开始对window的这些主要属性和方法进行讲解。
-
-# 二、窗口属性 *
-
-用于描述当前浏览器窗口的相关属性，这对于现在这个屏幕小到“160x160”（如智能手表），大到“4096×2160”（4K屏幕）的互联网时代来说，要做到同一个项目在不同分辨率屏幕的设备上做出响应式的设计一直是前端开发工程师头痛的问题。虽然说现在已经有很多CSS框架都或多或少的能帮上一些忙，但它们都有各自的局限性，而且还存在一些学习成本。但是如果能掌握原生JavaScript一些关于浏览器窗口的属性，对于我们做响应式设计也有不小的帮助。
+浏览器窗口的相关属性对于响应式设计至关重要，尤其是在支持从智能手表（160×160）到 4K 屏幕（4096×2160）的设备时，合理调整布局是前端开发中的难点。除了 CSS 框架，我们也可以借助 BOM 提供的窗口属性进行适配。
 
 浏览器窗口相关的主要属性有以下（数值表示的单位统一为像素）:
 
 ![](./IMGS/rect.jpeg)
 
-> 提示：
->
-> window.pageYOffset 类似于 scrollTop
->
-> ```
-> document.documentElement.scrollTop || document.body.scrollTop
-> ```
+1. innerWidth、innerHeight：浏览器视口的宽高（包含滚动条）
+2. outerWidth、outerHeight：浏览器窗口的整体宽高
+3. pageXOffset、pageYOffset：页面滚动的偏移量（等价于 scrollLeft 和 scrollTop）
+4. screenX、screenY（或 screenLeft、screenTop）：浏览器窗口相对于屏幕的坐标
 
-> 注意：innerWidth、innerHeight、outerWidth、outerHeight都会包含滚动条的宽度。这些属性都是只读的，它们会根据当前浏览器的尺寸或内容的变化而动态地跟随变化。
+> **注意**：innerWidth、innerHeight 等属性都包含滚动条的宽度，且这些属性是只读的，会随窗口大小变化而动态更新。
+
+如果要隐藏滚动条，可以使用以下 CSS 代码：
 
 ```css
-/*隐藏滚动条*/
 body::-webkit-scrollbar {
     display: none;
 }
 ```
 
-# 三、窗口方法 *
+# 窗口方法 *
 
-- `open(?url, ?target)`：打开新网页
-- `close()`：关闭网页
+**基本窗口操作**
 
-- `print()`：打印网页
-- `getSelection() `：获取选中文本
+- `open(url?, target?)`：打开新窗口
+- `close()`：关闭当前窗口
+
+**其他窗口方法**
+
+- `print()`：打印当前页面
+- `getSelection() `：获取选中的文本
 
 【实例 1】获取选中内容
 
 ```html
 <div id="selText">
-	<pre>曾经沧海难为水，除却巫山不是云。</pre>
-	<pre>取次花丛懒回顾，半缘修道半缘君。</pre>
+    <pre>曾经沧海难为水，除却巫山不是云。</pre>
+    <pre>取次花丛懒回顾，半缘修道半缘君。</pre>
 </div>
 <p id="selRes">您选中的内容是：</p>
 ```
 
 ```js
-var oDiv = document.querySelector('#selBox');
-var oSel = document.querySelector('#selRes');
+const oDiv = document.querySelector('#selBox');
+const oSel = document.querySelector('#selRes');
 oDiv.onmouseup = function() {
     // 获取选中对象
     var selObj = getSelection();
@@ -87,13 +91,13 @@ oDiv.onmouseup = function() {
 }
 ```
 
-示例中使用了一个 `mouseup` 事件来激活用户选择文本的操作。
+示例中使用 mouseup 事件来触发选中文本的获取。
 
-# 四、窗口对象
+# 窗口对象
 
 ## 1. document
 
-详情参考标准化DOM操作里面的 `document` 对象。
+document 主要用于操作 DOM，具体内容可参考标准 DOM 操作相关文档。
 
 ## 2. frames
 
@@ -103,119 +107,102 @@ oDiv.onmouseup = function() {
 
 ## 3. Screen 
 
-[Screen](https://developer.mozilla.org/zh-CN/docs/Web/API/Screen) 屏幕对象相关属性都是只读的，它们返回浏览器相对于当前计算机屏幕的数据信息。screen 对象是用于描述当前浏览器相对于屏幕信息的主要对象，所含属性如下：
+[Screen](https://developer.mozilla.org/zh-CN/docs/Web/API/Screen)  对象提供当前设备屏幕的信息，所有属性均为只读：
 
 ![](./IMGS/bom_screen.png)
 
-| #           | -                                |
-| ----------- | -------------------------------- |
-| availWidth  | 览器窗口相对于屏幕而言的可用宽度 |
-| availHeight | 览器窗口相对于屏幕而言的可用高度 |
-| colorDepth  | 颜色深度                         |
-| pixelDepth  | 像素深度                         |
-| width       | 屏幕宽度                         |
-| height      | 屏幕高度                         |
+| 属性        | 描述                           |
+| ----------- | ------------------------------ |
+| availWidth  | 屏幕可用宽度（不包括任务栏等） |
+| availHeight | 屏幕可用高度（不包括任务栏等） |
+| colorDepth  | 颜色深度                       |
+| pixelDepth  | 像素深度                       |
+| width       | 屏幕宽度                       |
+| height      | 屏幕高度                       |
 
-| 属性       | 描述                                     |
-| ---------- | ---------------------------------------- |
-| screenLeft | 返回当前浏览器窗口距离屏幕左侧的像素数值 |
-| screenTop  | 返回当前浏览器窗口距离屏幕上侧的像素数值 |
-| screenX    | 作用和screenLeft相同                     |
-| screenY    | 作用和screenTop相同                      |
+另外，screenLeft/screenX 和 screenTop/screenY 记录浏览器窗口相对于屏幕的坐标，由于历史原因，IE 使用 screenLeft/screenTop，而其他浏览器使用 screenX/screenY，兼容性处理如下：
 
-之所以出现这样同功能的属性归根到底，还是因为BOM一直没有一个标准造成的，根据资料显示支持screenLeft和screenTop的浏览器有：IE、Chrome、Safari、Opera，但Firxfox不支持。而支持screenX和screenY的浏览器有：Firxfox、Chrome、Safari、Opera，但IE不支持。
-
-为了解决这样兼容性问题，我们可以用一个自定义的三元表达式的办法来解决：
+```js
+const screenX = window.screenLeft !== undefined ? window.screenLeft : window.screenX;
+const screenY = window.screenTop !== undefined ? window.screenTop : window.screenY;
+```
 
 ## 4. Navigator
 
-[Navigator](https://developer.mozilla.org/zh-CN/docs/Web/API/Navigator) 用来包含浏览器详细信息的对象，通常用于做浏览器兼容性处理和设备的响应设计。可以打开浏览器输入这个navigator对象的名称来查看不同的浏览器的相关属性.
+[Navigator](https://developer.mozilla.org/zh-CN/docs/Web/API/Navigator) 对象包含浏览器详细信息，常用于设备兼容性检测。
 
-在控制台输出的内容为一个对象，对象展开后会包含比较多的属性，其中 `userAgent` 是一个比较重要的属性。在早期作浏览器判断都是依靠这个属性，不过随着浏览器版本的发展，再用这个属性去区分不同的浏览器已经行不通了。
-
-通过观察，可以在里面发现一些其它浏览器的信息，如“Mozilla”（FireFox浏览器厂商）和“Safari”（苹果浏览器）这些额外的信息，所以想通过它来判断当前浏览器究竟是哪个浏览器是不可能了，但是使用这个属性还是可以用于判断当前的设备是PC端还是移动端的。现在我们通过谷歌开发者工具将当前环境模拟为移动端环境，然后再次在控制内输入 `navigator.userAgent` 这个属性观察：
-
-```javascript
-navigator.userAgent
-'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36'
-```
+**示例：判断设备类型**
 
 ```js
-// 1. 判断是移动端还是PC端
+// 1. 判断是否为移动端
 /Mobile/.test(navigator.userAgent);
 
-// 2. 判断是否是iOS系统
+// 2. 判断是否为 iOS 设备
 /iOS/.test(navigator.userAgent);
 
-// 3. 判断是否是Android系统
+// 3. 判断是否为 Android 设备
 /Android/.test(navigator.userAgent);
 ```
 
 ## 5. Location
 
-[Location](https://developer.mozilla.org/zh-CN/docs/Web/API/Location) 用于描述当前页面的地址信息。首先我们拿百度首页来做这个对象的测试，简单观察该对象的相关属性属性。
+[Location](https://developer.mozilla.org/zh-CN/docs/Web/API/Location) 提供当前页面的地址信息，可用于页面跳转、参数传递等。
 
 ![](./IMGS/bom_location.png)
 
-【实例 1】通过 `location.href` 实现重定向或页面跳转：
+【实例 1】**页面跳转**
 
 ```js
-// 进入主页，首先判断用户是否登陆，如果用户没有登陆，跳转至登陆页面
-var isLogin = false;
-if(!isLogin) {
-	location.href = "./pages/login.html";
+// 如果用户未登录，跳转至登录页面
+if (!isLogin) {
+    location.href = "./pages/login.html";
 }
 ```
 
-【实例 2】通过 `location.href` 和 `location.search` 实现数据传递 和 获取：
+【实例 2】**传递 URL 参数**
 
-比如从A页面需传递id、数量、颜色给B页面，那么在A页面跳转至B页面时的代码如下：
+在 A 页面：
 
 ```js
-// 页面跳转时，将参数拼接在地址后面，通过?隔开，参数与参数之间使用&隔开
 location.href = "../pages/B.html?id=1001&nums=2&color=black";
 ```
 
-在B页面中，可以通过 `location.search` 获取：
+在 B 页面：
 
 ```js
-location.search // ?id=1001&nums=2&color=black"
+console.log(location.search); // "?id=1001&nums=2&color=black"
 ```
 
-拿到参数之后，我们需要对参数进行处理，将其转换成一个字符串，可参考下列函数：
+解析参数：
 
-```javascript
-function locSearchValToObj(searchStr) {
-    // 异常处理
-    if (!searchStr) {
-        return null;
-    }else {
-        var str = searchStr.slice(1);
-        var strArr = str.split('&');
-        var obj = {};
-        strArr.forEach(function(item){
-            var arr = item.split('=');
-            var key = decodeURI(arr[0]);
-            var val = decodeURI(arr[1]);
-            obj[key] = val;
-        });
-        return obj;
-    }
+```js
+function parseQueryParams(searchStr) {
+    if (!searchStr) return null;
+    return Object.fromEntries(new URLSearchParams(searchStr));
 }
 ```
 
 ## 6. History
 
-[History >>](https://developer.mozilla.org/zh-CN/docs/Web/API/History) 接口允许操作浏览器的曾经在标签页或者框架里访问的会话历史记录
+[History >>](https://developer.mozilla.org/zh-CN/docs/Web/API/History)  允许操作浏览器历史记录
 
-- 属性
-  - length：历史记录长度
-  - scrollRestoration：设置默认滚动恢复行为
-  - state
-- 方法：
-  - `back()`：向后移动一页
-  - `forward`：向前移动一页
-  - `go(delta)`：跳转至指定页
-  - `pushState()`：向当前浏览器会话的历史堆栈中添加一个状态
-  - `replaceState()`：替换当前状态
+**主要属性**
+
+- length：历史记录长度
+- scrollRestoration：滚动恢复行为
+- state：当前状态对象
+
+**主要方法**
+
+- `back()`：回到上一页
+- `forward()`：前进到下一页
+- `go(n)`：跳转到指定页（负数为后退，正数为前进）
+- `pushState(state, title, url)`：添加历史记录
+- `replaceState(state, title, url)`：替换当前历史记录
+
+**示例：使用 pushState**
+
+```js
+history.pushState({ page: 1 }, "title 1", "?page=1");
+```
 

@@ -1,26 +1,26 @@
-# 一、概述
+# 概述
 
-[DOM](https://developer.mozilla.org/zh-CN/docs/Web/API/Document_Object_Model)（**D**ocument **O**bject **M**odel，即 文档对象模型）是 js 操作网页的接口，它的作用是将网页转为一个 js 对象，从而可以用脚本进行各种操作（比如增删内容）。
+[DOM](https://developer.mozilla.org/zh-CN/docs/Web/API/Document_Object_Model)（**D**ocument **O**bject **M**odel，即 文档对象模型）**是网页的编程接口**，它将 HTML / XML 解析为 **结构化的对象**，从而允许 JavaScript 对网页进行操作（如增删改查）。
 
-浏览器会根据DOM模型，将结构化文档 *（如 HTML / XML）* 解析成一系列的节点，再由这些节点组成一个树状结构。所有的节点和最终的树状结构，都有规范的对外接口。所以，DOM可以理解成网页的编程接口。
+浏览器根据 DOM 规范，将文档解析成 **树状结构（DOM 树）**，其中每个部分（标签、属性、文本等）都是 **节点（Node）**。所有节点都遵循统一的 API，可供 JavaScript 操作。
 
-严格地说，DOM不属于 js，但是操作DOM是 js 最常见的任务，而 js 也 是最常用于DOM操作的语言。本章介绍的就是 js 对DOM标准的实现和用法。
+> **注意**：DOM 并不属于 JavaScript，但 JS 是最常用于操作 DOM 的语言。
 
-# 二、节点
+# 节点
 
-## 1. 概念
+## 概念
 
 DOM 的最小组成单位叫做 **节点**（`Node`）。文档的树形结构（DOM树），就是由各种不同类型的节点组成。
 
 节点的类型有七种：
 
-- `Document`：**文档节点**，代表整个文档（DOM树的根节点）
-- `DocumentType`：**doctype** 标签（比如 `<!DOCTYPE html>` ）
-- `Element`：**元素节点**，网页的各种HTML标签（比如 `<body>`、`<a>`等）*
-- `Attribute`：**属性节点**，元素的属性（比如 `class="right"` ）*
-- `Text`：**文本节点** ，代表元素或属性的文本内容 *
-- `Comment`：**注释节点** 
-- `DocumentFragment`：文档的片段
+- `Document`：**文档节点**，代表整个网页（DOM 树的根节点）
+- `DocumentType`：**文档类型节点类型** ：如 \<!DOCTYPE html>
+- `Element`：**元素节点**，网页的 HTML 标签，如 \<body>、\<a>。
+- `Attribute`：**属性节点**，元素的属性，如 class="right"（现代 JS 主要通过 element.getAttribute() 操作）。
+- `Text`：**文本节点** ，元素或属性中的文本内容
+- `Comment`：**注释节点** ，TML 中的 \<!-- 注释 -->
+- `DocumentFragment`：轻量级的 DOM 结构，常用于批量插入节点以优化性能。
 
 > 提示：这七种节点都属于浏览器原生提供的节点对象的派生对象，具有一些共同的属性和方法。
 
@@ -38,7 +38,7 @@ DOM 的最小组成单位叫做 **节点**（`Node`）。文档的树形结构�
 
 > 提示：本节知识点作为了解即可。
 
-##  2. 节点树
+##  节点树
 
 一个文档的所有节点，按照所在的层级，可以抽象成一种树状结构，这种树状结构就是 **DOM树**。
 
@@ -68,7 +68,7 @@ DOM 的最小组成单位叫做 **节点**（`Node`）。文档的树形结构�
 
 ![](IMGS/nodeTree.png)
 
-## 3. 节点集合
+## 节点集合
 
 节点都是单个对象，有时会需要一种数据结构，能够容纳多个节点。DOM提供两种集合对象，用于实现这种节点的集合：
 
@@ -79,7 +79,7 @@ DOM 的最小组成单位叫做 **节点**（`Node`）。文档的树形结构�
 
 > 提示：`NodeList` / `HTMLCollection` 属于 **类似数组** 对象，不能直接使用数组方法，如果要通过数组方法来遍历节点集合，你需要将它们转换为真正的数组。
 
-# 三、节点查询
+# 节点查询
 
 为了便于演示后面的示例，我们现在在 `<body>`标签中插入以下内容：
 
@@ -96,7 +96,7 @@ DOM 的最小组成单位叫做 **节点**（`Node`）。文档的树形结构�
 <div name="address">成都市高新区新川科技园A区</div>
 ```
 
-## 1. 直接查找 *
+## 直接查找 *
 
 ```js
 // 1. 根据ID查找
@@ -112,7 +112,7 @@ document.querySelector("#company"); *
 document.querySelectorAll(".departments li"); *
 ```
 
-## 2. 间接查找 *
+## 间接查找 *
 
 通过已找到的其他标签来查找。
 
@@ -139,7 +139,7 @@ list.firstElementChild
 list.lastElementChild
 ```
 
-## 3. 其他查询
+## 其他查询
 
 ```js
 // 01. 查找文档类型
@@ -170,9 +170,9 @@ document.embeds
 document.title *
 ```
 
-# 四、节点操作 *
+# 节点操作 *
 
-## 1. 创建节点
+## 创建节点
 
 ```js
 // 01. 创建元素节点
@@ -190,8 +190,8 @@ document.createDocumentFragment();
 ```js
 function nodeToFragment(el) {
   // 1. 创建 fragment 对象
-  var fragment = document.createDocumentFragment();
-  var child;
+  const fragment = document.createDocumentFragment();
+  const child;
   // 2. 将原生节点移动到fragment中
   while ((child = el.firstChild)) {
     fragment.appendChild(child);
@@ -201,7 +201,7 @@ function nodeToFragment(el) {
 }
 ```
 
-## 2. 操作属性
+## 操作属性
 
 ```js
 // 1. 设置、修改、读取属性 *
@@ -218,7 +218,7 @@ el.attributes;
 el.dataset.desc = "耀哥博客地址";
 ```
 
-## 3. 操作类名
+## 操作类名
 
 ```js
 // 1. 通过classname操作类名 *
@@ -244,7 +244,7 @@ el.classList.item(0); // link
 el.classList.toString();
 ```
 
-## 4. 操作内容
+## 操作内容
 
 ```js
 // 1. textContent
@@ -262,7 +262,7 @@ el.innerHTML
 
 > 提示：`textContent` 设置显示文本，不能识别 HTML标签，而 `innerHTML` 可以识别 HTML 标签。
 
-## 5. 插入节点
+## 插入节点
 
 ```js
 // 1. 在指定元素内追加(后面)
@@ -291,7 +291,7 @@ tag.insertAdjacentHTML("beforeend", "<h1>新插入的节点</h1>");
 
 > 提示：`insertAdjacentHTML` 方法可以识别 `html` 标签。
 
-## 6. 操作样式
+## 操作样式
 
 ```js
 // 1. 逐一赋值
@@ -315,7 +315,7 @@ if(el.style.color == undefined) {
 
 > 提示：通过脚本添加/读取的样式是行内样式。
 
-## 7. 替换节点
+## 替换节点
 
 ```js
 // 1. 主动替换
@@ -324,7 +324,7 @@ tag.replaceWith(el);
 parent.replaceChild(el, child);
 ```
 
-## 8. 移除节点
+## 移除节点
 
 ```js
 // 1. 主动移除
@@ -334,7 +334,7 @@ el.remove();
 parent.removeChild(el);
 ```
 
-# 五、补充知识
+# 补充知识
 
 ```js
 // 01. 获取元素的id
@@ -359,7 +359,7 @@ el.contains();
 el.isEqualNode();
 ```
 
-# 六、表单操作
+# 表单操作
 
 ```js
 // 1. 获取输入框输入的值
@@ -377,9 +377,9 @@ select.value
 select.selectedOptions
 ```
 
-# 七、拓展知识
+# 拓展知识
 
-## 1. 获取非行间样式 *
+## 获取非行间样式 *
 
 ```javascript
 function getStyle(el, attr) {
@@ -392,7 +392,7 @@ function getStyle(el, attr) {
 }
 ```
 
-## 2. 动态加载页面元素 *
+## 动态加载页面元素 *
 
 在实际开发中，我们需要动态加载页面元素，首先我们需要在html页面中准备一个容器，比如列表：
 
@@ -404,26 +404,12 @@ function getStyle(el, attr) {
 
 ```js
 // 1. 数据封装（模拟后台返回的数据结构）
-var data = [
-    {
-        "name": "李白",
-        "position": "刺客",
-        "skill": "青莲剑歌",
-        "exp": 500
-    },
-    {
-        "name": "貂蝉",
-        "position": "刺客/法师",
-        "skill": "绽·风华",
-        "exp": 350
-    },
-    {
-        "name": "鲁班",
-        "position": "射手",
-        "skill": "空中支援",
-        "exp": 800
-    }
+const data = [
+  { name: "李白", position: "刺客", skill: "青莲剑歌", exp: 500 },
+  { name: "貂蝉", position: "刺客/法师", skill: "绽·风华", exp: 350 },
+  { name: "鲁班", position: "射手", skill: "空中支援", exp: 800 }
 ];
+
 // 2. 获取容器
 var list = document.querySelector(".list");
 // 3. 遍历数据拼接li标签
@@ -440,7 +426,7 @@ data.forEach(function(hero) {
 list.innerHTML = htmlStr;
 ```
 
-## 3. DOM 性能优化 *
+## DOM 性能优化 *
 
 [参考 >>](https://feclub.cn/post/content/dom)
 
@@ -472,27 +458,27 @@ list.innerHTML = htmlStr;
 
 ### DOM操作对页面性能的影响
 
-如前面所说，DOM操作影响页面性能的核心问题主要在于DOM操作导致了页面的 **重绘** 或 **重排**，为了减少由于重绘和重排对网页性能的影响，我们要知道都有哪些操作会导致页面的重绘或者重排。
+DOM 操作会影响页面性能，主要是因为它会导致 **重绘** 或 **重排**。为了减少这些影响，我们需要了解哪些操作会触发重绘和重排。
 
 > **1）导致页面重排的操作**
 
-- 内容改变
-  - 文本改变或图片尺寸改变
-- DOM元素的几何属性的变化
-  - 例如改变DOM元素的宽高值时，原渲染树中的相关节点会失效，浏览器会根据变化后的DOM重新排建渲染树中的相关节点。如果父节点的几何属性变化时，还会使其子节点及后续兄弟节点重新计算位置等，造成一系列的重排。
-- DOM树的结构变化
-  - 添加DOM节点、修改DOM节点位置及删除某个节点都是对DOM树的更改，会造成页面的重排。浏览器布局是从上到下的过程，修改当前元素不会对其前边已经遍历过的元素造成影响，但是如果在所有的节点前添加一个新的元素，则后续的所有元素都要进行重排。
-- 获取某些属性
-  - 除了渲染树的直接变化，当获取一些属性值时，浏览器为取得正确的值也会发生重排，这些属性包括：`offsetTop`、`offsetLeft`、 `offsetWidth`、`offsetHeight`、`scrollTop`、`scrollLeft`、`scrollWidth`、`scrollHeight`、 `clientTop`、`clientLeft`、`clientWidth`、`clientHeight`、`getComputedStyle()`。
-- 浏览器窗口尺寸改变
-  - 窗口尺寸的改变会影响整个网页内元素的尺寸的改变，即DOM元素的集合属性变化，因此会造成重排。
+- **内容变化**
+  - 例如，文本内容变化或图片尺寸改变
+- **元素几何属性变化**
+  - 改变元素的宽高时，浏览器会重新计算并更新相关节点的位置，影响整个渲染树。
+- **DOM 树结构变化**
+  - 添加、删除或修改节点会导致整个 DOM 树的重排。如果在已有节点前添加新节点，后续所有元素都需要重新排版。
+- **获取某些属性**
+  - 获取如 offsetTop、offsetLeft、offsetWidth 等属性时，浏览器需要重排以计算这些值。
+- **浏览器窗口尺寸变化**
+  - 改变窗口大小会导致页面中元素尺寸调整，进而触发重排。
 
 > **2）导致页面重绘的操作**
 
-- 应用新的样式或者修改任何影响元素外观的属性
-  - 只改变了元素的样式，并未改变元素大小、位置，此时只涉及到重绘操作。
-- 重排一定会导致重绘
-  - 一个元素的重排一定会影响到渲染树的变化，因此也一定会涉及到页面的重绘。
+- **样式改变**
+  - 修改影响外观的样式（如 color、background），不会改变元素的位置或大小，只有重绘发生。
+- **重排会触发重绘**
+  - 每次重排都会导致渲染树的变化，进而触发重绘。
 
 ### 高频操作DOM会导致的问题
 
@@ -557,40 +543,40 @@ list.innerHTML = htmlStr;
 - 最小化重绘和重排
   - 通过类名更新样式
 
-## 4. CSS 动画 vs JS动画
+## CSS 动画 🆚 JS动画
 
 > `CSS` 动画
 
 优势：
 
-- 硬件加速：通过浏览器GPU来提高动画性能
-- 代码相对简单
-- 对于帧速表现不好的低版本浏览器，CSS3可以做到自然降级，而JS则需要撰写额外代码
+- **硬件加速**：通过浏览器的 GPU 提高动画性能。
+- **简洁代码**：实现简单动画时，代码较为简洁。
+- **自然降级**：低版本浏览器自动降级，避免额外的兼容性处理。
 
 劣势：
 
-- 代码冗长，实现复杂效果时，代码变得非常笨重
-- 有兼容性问题
-- 运行过程控制较弱，无法附加事件绑定回调函数。CSS动画只能暂停，不能在动画中寻找一个特定的时间点，不能在半路反转动画，不能变换时间尺度，不能在特定的位置添加回调函数或是绑定回放事件，无进度报告。
+- **实现复杂效果时较笨重**：复杂动画难以用纯 CSS 实现，代码冗长。
+- **兼容性问题**：某些浏览器可能不完全支持 CSS3 动画。
+- **控制能力弱**：无法精确控制动画，如暂停、特定时刻反转、调整时间尺度或添加回调函数。
 
 > `JavaScript` 动画
 
 优势：
 
-- 便于控制，可以在动画播放过程中对动画进行控制：开始、暂停、回放、终止、取消都是可以做到的。
-- 动画效果更丰富（曲线、视差滚动、冲击闪烁）
-- 无太多兼容性问题
+- **灵活控制**：可以动态控制动画的开始、暂停、回放、终止等。
+- **丰富效果**：支持更多复杂效果（如曲线、视差滚动等）。
+- **兼容性好**：与浏览器兼容性问题较少。
 
 劣势：
 
-- 主线程进行，可能导致线程阻塞，从而造成丢帧的情况
-- 代码的复杂度高于CSS动画
+- **主线程阻塞**：由于在主线程执行，可能导致丢帧或卡顿。
+- **代码复杂度高**：需要编写更多的代码来实现动画效果和控制。
 
-# 八、[MutationObserver](https://developer.mozilla.org/zh-CN/docs/Web/API/MutationObserver)
+# [MutationObserver](https://developer.mozilla.org/zh-CN/docs/Web/API/MutationObserver)
 
 接口提供了监视对DOM树所做更改的能力。
 
-## 1. API
+## API
 
 [`disconnect()`](https://developer.mozilla.org/zh-CN/docs/Web/API/MutationObserver/disconnect)
 
@@ -604,7 +590,7 @@ list.innerHTML = htmlStr;
 
 从MutationObserver的通知队列中删除所有待处理的通知，并将它们返回到[`MutationRecord`](https://developer.mozilla.org/zh-CN/docs/Web/API/MutationRecord)对象的新[`Array`](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Array)中。
 
-## 2. 示例
+## 示例
 
 ```js
 // 选择需要观察变动的节点

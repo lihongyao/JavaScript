@@ -1,12 +1,3 @@
-/*
- * @Author: Li-HONGYAO
- * @Date: 2021-04-19 17:15:11
- * @LastEditTime: 2022-12-06 15:58:59
- * @LastEditors: Lee
- * @Description:
- * @FilePath: \01.IndexDB\utils.js
- */
-
 class DB {
   /**
    * 构造器
@@ -16,8 +7,8 @@ class DB {
    */
   constructor(databaseName, version, storeOptions) {
     // 缓存数据库 { [name + version]：database }
-    this._dbs = {};
-    this._databaseName = databaseName;
+    this.dbs = {};
+    this.databaseName = databaseName;
     this.open(databaseName, version, storeOptions);
   }
 
@@ -25,194 +16,177 @@ class DB {
    * 打开数据库
    * @param {string} databaseName 数据库名
    * @param {number} version 数据库版本号（仅支持整数）
-   * @param {object} storeOptions 配置项
+   * @param {object} storeOptions 配置项 { 表名：主键 }
+   * @returns {Promise<IDBDatabase>} 返回数据库实例
    */
   open(databaseName, version, storeOptions) {
     return new Promise((resolve, reject) => {
-      // -- 检测是否有缓存，如果有缓存则直接从缓存中读取数据库
-      if (this._dbs[databaseName + version]) {
-        resolve(this._dbs[databaseName + version]);
+
+      // 检查缓存是否存在
+      const dbKey = `${databaseName}_${version}`;
+      if (this.dbs[dbKey]) {
+        resolve(this.dbs[dbKey]);
         return;
       }
-      // -- 打开数据库
+      
+      // 尝试打开数据库
       const request = indexedDB.open(databaseName, version);
-      // -- 事件监听：版本更新，创建新的store的时候
+
+      // 数据库版本更新时触发，通常用于创建或更新表结构
       request.onupgradeneeded = (event) => {
-        console.log('【Indexed-DB】：Upgrading...');
-        // IDBDatabase
+        console.log("【Indexed-DB】：数据库升级中...");
         const database = event.target.result;
-        // 缓存起来
-        this._dbs[databaseName + version] = database;
-        // 遍历仓库配置项
-        for (const key in storeOptions) {
-          // 判断是否存在仓库（表），不存在则新建
-          if (database.objectStoreNames.contains(key) === false) {
-            const keyPath = storeOptions[key] ? storeOptions[key] : [];
-            database.createObjectStore(key, { keyPath });
+        // 遍历配置项，创建新的数据表（objectStore）
+        for (const storeName in storeOptions) {
+          if (!database.objectStoreNames.contains(storeName)) {
+            const keyPath = storeOptions[storeName] || "id"; // 默认主键为 "id"
+            database.createObjectStore(storeName, { keyPath });
           }
         }
-        resolve(database);
       };
-      // -- 事件监听：数据库打开成功的回调
+
+      // 数据库打开成功
       request.onsuccess = (event) => {
-        console.log('【Indexed-DB】：open success.');
-        // IDBDatabase
+        console.log("【Indexed-DB】：数据库打开成功");
         const database = event.target.result;
-        // 缓存起来
-        this._dbs[databaseName + version] = database;
+        this.dbs[dbKey] = database; // 缓存数据库实例
         resolve(database);
       };
-      // -- 事件监听：数据库打开失败的回调
+
+      // 数据库打开失败
       request.onerror = (event) => {
-        reject(event);
-        console.error('【Indexed-DB】：', event);
+        console.error("【Indexed-DB】：数据库打开失败", event.target.error);
+        reject(new Error(`数据库打开失败：${event.target.error.message}`));
       };
     });
   }
 
   /**
    * 获取事务
-   * @param {*} storeName
-   * @param {*} version
-   * @returns
+   * @param {string} storeName 表名
+   * @param {string} mode 事务模式（默认只读 "readonly"，可选 "readwrite"）
+   * @returns {Promise<IDBTransaction>} 返回事务实例
    */
-  async _getTransaction(storeName, version) {
-    let db;
-    // 先从缓存获取
-    if (this._dbs[this._databaseName + version]) {
-      db = this._dbs[this._databaseName + version];
-    } else {
-      db = await this.open(this._databaseName, version);
-    }
-    return db.transaction([storeName], 'readwrite');
+  async _getTransaction(storeName, mode = "readonly") {
+    const dbKey = `${this.databaseName}_${this._version}`;
+    const db = this.dbs[dbKey] || (await this.open(this.databaseName, this._version));
+    return db.transaction([storeName], mode);
   }
 
   /**
-   * 获取store
-   * objectStore: 表示允许访问IndexedDB数据库中的一组数据的对象存储，
-   * @param {*} storeName
-   * @param {*} version
+   * 获取数据表对象
+   * @param {string} storeName 表名
+   * @param {string} mode 事务模式（默认只读 "readonly"，可选 "readwrite"）
+   * @returns {Promise<IDBObjectStore>} 返回数据表实例
    */
-  async _getObjectStore(storeName, version) {
-    const transaction = await this._getTransaction(storeName, version);
+  async _getObjectStore(storeName, mode = "readonly") {
+    const transaction = await this._getTransaction(storeName, mode);
     return transaction.objectStore(storeName);
   }
 
   /**
-   * 获取一个store
+   * 执行指定操作的通用方法
+   * @param {string} storeName 表名
+   * @param {string} action 操作类型（如 "get", "add", "put", "delete"）
+   * @param {...any} args 其他参数
+   * @returns {Promise<any>} 返回操作结果
    */
-  collection(storeName, version) {
-    this.currentStore = storeName;
-    this._getObjectStore(storeName, version);
-    return this;
-  }
-
-  /**
-   * 查询数据
-   * @param {string | number} id
-   * @returns
-   */
-  async get(id) {
-    return new Promise(async (resolve, reject) => {
-      const objectStore = await this._getObjectStore(this.currentStore);
-      const request = objectStore.get(id);
-      request.onsuccess = function (event) {
-        resolve(event.target.result);
-      };
+  async _executeRequest(storeName, action, ...args) {
+    const objectStore = await this._getObjectStore(storeName, action === "get" ? "readonly" : "readwrite");
+    return new Promise((resolve, reject) => {
+      const request = objectStore[action](...args);
+      request.onsuccess = (event) => resolve(event.target.result);
       request.onerror = (event) => {
-        reject(event);
+        console.error(`【Indexed-DB】：${action} 操作失败`, event.target.error);
+        reject(event.target.error);
       };
     });
   }
+
   /**
    * 添加数据
-   * @param {object} data
-   * @returns
+   * @param {string} storeName 表名
+   * @param {object} data 数据对象
+   * @returns {Promise<number>} 返回新增数据的主键值
    */
-  async add(data) {
-    return new Promise(async (resolve, reject) => {
-      const objectStore = await this._getObjectStore(this.currentStore, 3);
-      const request = objectStore.add(data);
-      request.onsuccess = function (event) {
-        resolve(event.target.result);
-      };
-      request.onerror = (event) => {
-        reject(event);
-      };
-    });
+  async add(storeName, data) {
+    return this._executeRequest(storeName, "add", data);
   }
+
   /**
-   * 删除数据
-   * @param {string | number} id
-   * @returns
+   * 获取数据
+   * @param {string} storeName 表名
+   * @param {string | number} id 主键值
+   * @returns {Promise<object>} 返回数据对象
    */
-  async delete(id) {
-    return new Promise(async (resolve, reject) => {
-      const objectStore = await this._getObjectStore(this.currentStore);
-      const request = objectStore.delete(id);
-      request.onsuccess = function (event) {
-        resolve(true);
-      };
-      request.onerror = (event) => {
-        console.log('【Indexed-DB】：', event);
-        reject(false);
-      };
-    });
+  async get(storeName, id) {
+    return this._executeRequest(storeName, "get", id);
   }
+
   /**
    * 更新数据
-   * 数据不存在，则会新增数据
-   * @param {*} data
-   * @returns
+   * @param {string} storeName 表名
+   * @param {object} data 数据对象
+   * @returns {Promise<number>} 返回更新数据的主键值
    */
-  async put(data) {
-    console.log('Put...');
-    return new Promise(async (resolve, reject) => {
-      const objectStore = await this._getObjectStore(this.currentStore);
-      const request = objectStore.put(data);
-      request.onsuccess = function (event) {
-        resolve(event.target.result);
-      };
-      request.onerror = (event) => {
-        reject(event);
-      };
+  async put(storeName, data) {
+    return this._executeRequest(storeName, "put", data);
+  }
+
+  /**
+   * 删除数据
+   * @param {string} storeName 表名
+   * @param {string | number} id 主键值
+   * @returns {Promise<boolean>} 返回操作结果
+   */
+  async delete(storeName, id) {
+    await this._executeRequest(storeName, "delete", id);
+    return true;
+  }
+
+  /**
+   * 清空数据表
+   * @param {string} storeName 表名
+   * @returns {Promise<void>} 返回操作结果
+   */
+  async clear(storeName) {
+    await this._executeRequest(storeName, "clear");
+  }
+
+  /**
+   * 获取所有数据
+   * @param {string} storeName 表名
+   * @returns {Promise<Array<object>>} 返回数据数组
+   */
+  async getAll(storeName) {
+    const objectStore = await this._getObjectStore(storeName);
+    return new Promise((resolve, reject) => {
+      const request = objectStore.getAll();
+      request.onsuccess = (event) => resolve(event.target.result);
+      request.onerror = (event) => reject(event.target.error);
     });
   }
 
-  async clear(storeName) {
-    return new Promise((resolve, reject) => {
-      this._getObjectStore(this.currentStore).then((objectStore) => {
-        const request = objectStore.clear(data);
-        request.onsuccess = function (event) {
-          resolve(event.target.result);
-        };
-        request.onerror = (event) => {
-          reject(event);
-        };
-      });
-    });
-  }
   /**
    * 遍历数据
-   * @returns
+   * @param {string} storeName 表名
+   * @param {function} callback 遍历回调函数 (cursor) => void
+   * @returns {Promise<void>}
    */
-  async each() {
-    return new Promise(async (resolve, reject) => {
-      const objectStore = await this._getObjectStore(this.currentStore);
+  async each(storeName, callback) {
+    const objectStore = await this._getObjectStore(storeName);
+    return new Promise((resolve, reject) => {
       const request = objectStore.openCursor();
-      const resp = [];
-      request.onsuccess = function (event) {
+      request.onsuccess = (event) => {
         const cursor = event.target.result;
         if (cursor) {
-          resp.push(cursor.value);
+          callback(cursor.value);
           cursor.continue();
         } else {
-          resolve(resp);
+          resolve();
         }
       };
-      request.onerror = (event) => {
-        reject(event);
-      };
+      request.onerror = (event) => reject(event.target.error);
     });
   }
 }

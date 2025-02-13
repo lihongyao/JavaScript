@@ -1,69 +1,90 @@
- # 一、前言
+ # 前言
 
-在Web应用中，实现动画效果的方法比较多：
+在 Web 应用中，实现动画效果的方法有很多：
 
-- CSS3：Transition（过度） / Animation（动画）
-
+- CSS3：transition（过渡） / animation（动画）
 - HTML5：Canvas
-- JavaScript：setInterval（定时器） / requestAnimationFrame（请求动画帧） / jQuery
+- JavaScript：
+  - setInterval / setTimeout（定时器）
+  - requestAnimationFrame（请求动画帧）
+  - jQuery.animate()
 
-本篇文章重点讲解 requestAnimationFrame **请求动画帧**；
+本篇文章重点讲解 requestAnimationFrame（**请求动画帧**）。
 
-requestAnimationFrame 的用法跟 setInterval 差不多，与 setInterval 相比，最大的优势是 **由浏览器来决定函数的执行时机**。形象一点的解释就是：告诉浏览器说 “我这里有一个函数要执行，你有空了帮忙执行一下”，然后浏览器相对比较空闲的时候就给执行了。
+它的用法类似于 setInterval，但与 setInterval 相比，最大的优势在于 **由浏览器决定函数的执行时机**。简单来说，它的工作方式是：**告诉浏览器 “我这里有一个动画任务要执行，你有空了帮我执行一下”**，然后浏览器会在合适的时间执行，以保证动画的流畅度和性能。
 
-# 二、相关概念
+# 相关概念
 
-为了理解 `requestAnimationFrame ` 背后的原理，我们首先需要了解一下与之相关的几个概念。
+在深入了解 requestAnimationFrame 的工作原理之前，我们先掌握几个重要概念。
 
-## 1. 页面可见
+## 页面可见
 
-当页面被最小化或者被切换成后台标签页时，页面为不可见，浏览器会触发一个 `visibilitychange` 事件，并设置 `document.hidden` 属性为 `true`；切换到显示状态时，页面为可见，也同样触发一个 `visibilitychange` 事件，设置 `document.hidden` 属性为 `false`。
+当页面被最小化或切换到后台标签页时，它处于 **不可见** 状态。浏览器会触发 visibilitychange 事件，并将 document.hidden 设为 true。当页面恢复可见时，该属性变回 false。
 
-## 2. 动画帧请求回调函数列表
+## 动画帧请求回调函数列表
 
-每个 Document 都有一个动画帧请求回调函数列表，该列表可以看成是由 `<handlerId, callback>` 元组组成的集合。其中 `handlerId` 是一个整数，唯一地标识了元组在列表中的位置；`callback` 是回调函数。
+每个 document 维护着一个**动画帧回调函数列表**，可以看作是 <handlerId, callback> 这样的集合：
 
-## 3. 屏幕刷新频率
+- handlerId：整数，唯一标识回调函数的位置。
+- callback：注册的回调函数。
 
-即图像在屏幕上更新的速度，也即屏幕上的图像每秒钟出现的次数，它的单位是赫兹(Hz)。 对于一般笔记本电脑，这个频率大概是 **60Hz**， 这个值的设定受屏幕分辨率、屏幕尺寸和显卡的影响。
+当 requestAnimationFrame 被调用时，浏览器会将 callback 加入到该列表，并在合适的时机执行。
 
-## 4. 动画原理
+## 屏幕刷新频率
 
-根据上面的原理我们知道，你眼前所看到图像正在以每秒60次的频率刷新，由于刷新频率很高，因此你感觉不到它在刷新。而 **动画本质就是要让人眼看到图像被刷新而引起变化的视觉效果，这个变化要以连贯的、平滑的方式进行过渡。**  那怎么样才能做到这种效果呢？
+屏幕刷新率（Frame Rate）指的是**屏幕每秒刷新图像的次数**，单位为赫兹（Hz）。一般笔记本和显示器的刷新率为 **60Hz**，即 **每 16.7 毫秒刷新一次**（1000ms / 60 ≈ 16.7ms）。
 
-刷新频率为60Hz的屏幕每 **16.7ms**（$1000 \div 60 \approx 16.7$） 刷新一次，我们在屏幕每次刷新前，将图像的位置向左移动一个像素，即 **1px**。这样一来，屏幕每次刷出来的图像位置都比前一个要差1px，因此你会看到图像在移动；由于我们人眼的视觉停留效应，当前位置的图像停留在大脑的印象还没消失，紧接着图像又被移到了下一个位置，因此你才会看到图像在流畅的移动，这就是视觉效果上形成的动画。
+## 动画实现原理
 
-# 三、API
+动画的本质是让画面发生平滑的变化，让人眼察觉到视觉上的运动。例如：
 
-## 1. 语法
+1. **假设屏幕刷新率为 60Hz，每 16.7ms 更新一次**。
+2. **在每次刷新前，将物体向左移动 1px**。
+3. **由于视觉暂留效应，画面上的物体似乎是在平滑移动**。
+
+如果代码能做到 **每帧都在屏幕刷新前更新**，那么动画就会流畅无比。requestAnimationFrame 就是专门为此设计的 API。
+
+# API
+
+## 语法
 
 ```js
-const handlerId = window.requestAnimationFrame(callback);
+const handlerId = requestAnimationFrame(callback);
 ```
 
-- `callback`：下一次重绘之前更新动画帧所调用的函数（回调函数）。
-- `handlerId`：请求 ID，大于 0 的长整型 ，唯一标识了该回调函数在回调列表中的位置。
+- `callback`：每一帧执行的回调函数。
+- `handlerId`：唯一的 ID，可用于取消动画。
 
-## 2. 浏览器执行过程
+## 浏览器执行过程
 
-1. 首先要 **判断**  `document.hidden` 属性是否为`true`，即页面处于可见状态下才会执行；
-2. 浏览器 **清空** 上一轮的动画函数；
-3. 将 `handlerId` 和 `callback` 以 `<handlerId , callback>`  的形式 **推入** 到动画帧请求回调函数列；
-4. 浏览器会 **遍历** 动画帧请求回调函数列表，根据 `handlerId` 的值大小，依次去执行相应的动画函数。
+浏览器执行 requestAnimationFrame 时，会按照以下流程：
 
-## 3. 取消动画函数
+1. **判断页面是否可见**（document.hidden 是否为 false）。
+2. **清空上一轮的回调函数**。
+3. **将新的 <handlerId, callback> 加入回调队列**。
+4. **在下次屏幕刷新前，遍历回调列表，执行所有 callback**。
+
+## 取消动画
+
+可以使用 cancelAnimationFrame(handlerId) 取消特定动画：
 
 ```js
 cancelAnimationFrame(handlerId);
 ```
 
-# 四、使用
+适用于：
 
-## 1. 动画
+1. 动画停止时取消动画。
+2. 防止动画多次触发。
+3. 优化性能，减少 CPU 计算。
 
-requestAnimationFrame API 本身的设计就是用来解决 JavaScript 动画的性能问题。那么，为什么 requestAnimationFrame 做动画性能会更好呢？主要原因在于 requestAnimationFrame 更加智能，它并非加快执行速度，而是适当时候降帧，防止并解决丢帧问题。当它发现无法维持60fps的频率时，它会把频率降低到30fps来保持帧数的稳定。也就是说如果上一次 rAF（即 requestAnimationFrame 缩写） 的回调执行时间过长，那么触发下一次 rAF 回调的时间就会缩短，反之亦然，这也是为什么说由浏览器来决定执行时机性能会更好。
+# 使用示例
 
-我们来看一个进度条的实现：
+## 动画
+
+requestAnimationFrame 主要用于 **平滑动画**，它能**自适应屏幕刷新率**，保证动画流畅。
+
+**示例：进度条动画**
 
 ```html
 <div class="progress">
@@ -119,31 +140,39 @@ function onStop() {
 
 ![](./IMGS/rAF.gif)
 
-## 2. 函数节流
+## 函数节流
 
-在高频率事件中，为了防止16ms内发生多次函数执行，使用 rAF 可保证16ms 内只触发一次，这既能保证流畅性也能更好的节省函数执行的开销。*（注：16ms内函数执行多次没有意义，因为显示器16ms 刷新一次，多次执行并不会在界面上有任何显示）*。
+requestAnimationFrame 也可用于**节流高频事件**（如 mousemove、scroll），确保 16.7ms 只执行一次 *（注：16ms内函数执行多次没有意义，因为显示器16ms 刷新一次，多次执行并不会在界面上有任何显示）*。
 
 ```javascript
-window.onmousemove = ({ clientX, clientY }) => {
+window.addEventListener("mousemove", (event) => {
   requestAnimationFrame(() => {
-    console.log(clientX, clientY);
+    console.log(event.clientX, event.clientY);
   });
-};
+});
 ```
 
-## 3. CPU节能
+## CPU节能
 
-rAF 的另一个特性是：如果页面不是激活状态下的话，函数会自动暂停，有效节省了CPU开销。
+当网页进入后台或被最小化时，requestAnimationFrame **自动暂停**，降低 CPU 负担。而 setInterval 则仍然会运行。
 
-在移动端，如果页面中有自动播放的轮播图、倒计时或使用 `setTimeout` / `setInterval` 来执行任务的定时器。那么 **当应用进到后台或是锁屏后，WebViewCoreThread 仍然持续占用CPU，导致耗电**。而使用 rAF 可以很简单的解决此类问题。
+```js
+function animate() {
+  console.log("动画帧执行");
+  requestAnimationFrame(animate);
+}
+requestAnimationFrame(animate);
+```
 
-## 4. 优雅降级
+切换到后台时，**动画将自动暂停**。
+
+## 优雅降级
 
 由于兼容性问题，需要降级对接口进行封装，优先使用高级特性，再根据浏览器不同情况进行回退，直到只能使用 `setTimeout`。
 
 参考：https://github.com/darius/requestAnimationFrame
 
-## 5. 分帧初始化
+## 分帧初始化
 
 都知道，rAF 的执行时间约为16.7ms，即为一帧。那么可以使用它将页面初始化的函数进行打散到每一帧里，这样 **可以在初始化时降低CPU及内存开销**。
 
@@ -177,30 +206,32 @@ lazyLoadList.forEach((module) => {
 });
 ```
 
-## 6. 异步化
+## 异步化
 
-rAF 实际是一种异步化的操作，曾经：
+过去，我们用 `setTimeout(() => {}, 0)` 来异步执行任务，现在可以用 requestAnimationFrame 代替：
 
 ```js
-setTimeout(() => { /* ... */ }, 0);
+requestAnimationFrame(() => {
+  console.log("异步任务执行");
+});
 ```
 
-一度成为解决了很多前端疑难杂症的法宝。而现在，可以用它来代替。
-
-# 五、setInverval 🆚 rAF
+# setInterval vs requestAnimationFrame
 
 这里主要是比较二者在动画上的区别
 
-> **📌 `setInverval`**
+> **📌 `setInverval` 的问题** 
 
-`setInverval` 是通过设置一个间隔时间来不断的改变图像的位置，从而达到动画效果的。但利用 `setInverval` 实现的动画在某些低端机上会出现卡顿、抖动的现象。 这种现象的产生有两个原因：
+setInterval 设置一个固定间隔执行动画，但 **实际执行时间会因主线程阻塞而延迟**，可能导致 **丢帧和卡顿**。
 
-- `setInverval` 的执行时间并不是确定的。在 Javascript 中， `setInverval` 任务（宏任务）被放进了异步队列中，只有当主线程上的任务执行完以后，才会去检查该队列里的任务是否需要开始执行，因此 **`setInverval` 的实际执行时间一般要比其设定的时间晚一些。**
-- 刷新频率受屏幕分辨率和屏幕尺寸的影响，因此不同设备的屏幕刷新频率可能会不同，而 `setInterval` 只能设置一个固定的时间间隔，这个时间不一定和屏幕的刷新时间相同。
+**丢帧示例**
 
-以上两种情况都会导致 `setInterval` 的执行步调和屏幕的刷新步调不一致，从而引起 **丢帧** 现象。 那为什么步调不一致就会引起丢帧呢？
+如果 setInterval(fn, 10)，但屏幕刷新率是 60Hz（每 16.7ms 刷新一次）：
 
-首先要明白，`setInterval` 的执行只是在内存中对图像属性进行改变，这个变化必须要等到屏幕下次刷新时才会被更新到屏幕上。如果两者的步调不一致，就可能会导致中间某一帧的操作被跨越过去，而直接更新下一帧的图像。
+- setInterval 执行 10ms 后更新动画（但屏幕未刷新）。
+- **下一次刷新是 16.7ms 后，导致 10ms 这帧被跳过，动画变得卡顿**。
+
+扩展示例：
 
 假设屏幕每隔16.7ms刷新一次，而 setInterval 每隔10ms设置图像向左移动1px， 就会出现如下绘制过程：
 
@@ -214,11 +245,13 @@ setTimeout(() => { /* ... */ }, 0);
 
 从上面的绘制过程中可以看出，屏幕没有更新 `left=2px` 的那一帧画面，图像直接从1px的位置跳到了3px的的位置，这就是丢帧现象，这种现象就会引起动画卡顿。
 
-> **📌 `requestAnimationFrame`**
+> **📌 `requestAnimationFrame` 的优势** 
 
-与 `setInterval` 相比，rAF 最大的优势是由系统来决定回调函数的执行时机。具体一点讲，如果屏幕刷新率是60Hz，那么回调函数就每16.7ms 被执行一次，如果刷新率是75Hz，那么这个时间间隔就变成了1000/75=13.3ms，换句话说就是，rAF 的步伐跟着系统的刷新步伐走。它能保证回调函数在屏幕每一次的刷新间隔中只被执行一次，这样就不会引起丢帧现象，也不会导致动画出现卡顿的问题。
+1. **自动匹配刷新率**，不会导致丢帧。
+2. **自动暂停后台动画，降低 CPU 负担**。
+3. **平滑的动画体验**。
 
-这个API的调用很简单，如下所示：
+**对比示例**
 
 ```js
 var progress = 0;
@@ -235,13 +268,16 @@ function render() {
 window.requestAnimationFrame(render);
 ```
 
-除此之外，`requestAnimationFrame` 还有以下两个优势：
+与 setInterval 相比，requestAnimationFrame **更适合处理动画**。
 
-- **CPU节能**：使用 setInterval 实现的动画，当页面被隐藏或最小化时，setInterval 仍然在后台执行动画任务，由于此时页面处于不可见或不可用状态，刷新动画是没有意义的，完全是浪费CPU资源。而 rAF 则完全不同，当页面处于未激活的状态下，该页面的屏幕刷新任务也会被系统暂停，因此跟着系统步伐走的 rAF 也会停止渲染，当页面被激活时，动画就从上次停留的地方继续执行，有效节省了CPU开销。
+# 总结
 
-- **函数节流**：在高频率事件（ resize / scroll等 ）中，为了防止在一个刷新间隔内发生多次函数执行，使用 rAF 可保证每个刷新间隔内，函数只被执行一次，这样既能保证流畅性，也能更好的节省函数执行的开销。一个刷新间隔内函数执行多次时没有意义的，因为显示器每16.7ms刷新一次，多次绘制并不会在屏幕上体现出来。
+- requestAnimationFrame 适用于 **动画、节流、异步任务**。
+- 其 **自动匹配刷新率**，能防止丢帧。
+- 在 **后台自动暂停**，提高性能。
+- **可用于分帧初始化，避免页面卡顿**。
 
-
+在实际开发中，**所有与动画相关的操作，建议使用 requestAnimationFrame 而非 setInterval**。
 
 
 
