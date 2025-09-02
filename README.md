@@ -8,7 +8,9 @@
 
 > **补充**：HTML 负责网页的骨架，CSS 负责美化和布局，而 JavaScript 赋予网页交互性，它们共同构成了现代 Web 开发的核心技术。
 
-JavaScript是一种高级编程语言，用于Web开发和创建交互式用户界面。它是一种动态类型语言，意味着变量类型在运行时确定。JavaScript可以在浏览器中运行，也可以在服务器端使用Node.js运行。它具有广泛的应用，包括网页开发、游戏开发、移动应用程序开发等。JavaScript具有易学性和灵活性，是Web开发中必不可少的一部分。
+JavaScript 是一种高级编程语言，用于Web开发和创建交互式用户界面。它是一种 **动态类型** 语言，意味着变量类型在运行时确定。
+
+JavaScript 可以在浏览器中运行，也可以在服务器端使用 Node.js 运行。它具有广泛的应用，包括网页开发、游戏开发、移动应用程序开发等。JavaScript 具有易学性和灵活性，是Web开发中必不可少的一部分。
 
 # 为什么学习 JavaScript
 
@@ -30,12 +32,12 @@ JavaScript 由 **Brendan Eich** 在 **1995 年**为 **Netscape** 公司的浏览
 
 **发展历程：**
 
-- **1995 年** —— **最初命名为 LiveScript**，但由于当时 Java 语言的流行，Netscape 与 Sun Microsystems 合作，将其更名为 **JavaScript**，实际上与 Java 关系不大。
-- **1996 年** —— **微软推出 JScript**，用于 IE 浏览器，与 JavaScript 类似，但存在兼容性问题。
-- **1997 年** —— **ECMAScript 标准诞生（ES1）**，JavaScript 由 ECMA（欧洲计算机制造商协会）标准化，成为 ECMAScript（ES）
-- **2009 年** —— **ES5 发布**，新增 JSON 支持、strict mode 等特性。
-- **2015 年** —— **ES6（ES2015）发布**，引入 let、const、箭头函数、类、模块化（import/export） 等现代特性。
-- **2016 年至今** —— **JavaScript 进入快速发展期**，ES 每年发布新版本（如 ES7、ES8…），同时现代前端框架（React、Vue、Angular）和后端技术（Node.js）让 JavaScript 生态更加成熟。
+- 1995 年 —— 最初命名为 LiveScript，但由于当时 Java 语言的流行，Netscape 与 Sun Microsystems 合作，将其更名为 **JavaScript**，实际上与 Java 关系不大。
+- 1996 年 —— 微软推出 JScript，用于 IE 浏览器，与 JavaScript 类似，但存在兼容性问题。
+- 1997 年 —— ECMAScript 标准诞生（ES1），JavaScript 由 ECMA（欧洲计算机制造商协会）标准化，成为 ECMAScript（ES）
+- 2009 年 —— ES5 发布，新增 JSON 支持、strict mode 等特性。
+- 2015 年 —— ES6（ES2015）发布，引入 let、const、箭头函数、类、模块化（import/export） 等现代特性。
+- 2016 年至今 —— **JavaScript 进入快速发展期**，ES 每年发布新版本（如 ES7、ES8…），同时现代前端框架（React、Vue、Angular）和后端技术（Node.js）让 JavaScript 生态更加成熟。
 
 > **总结**：JavaScript 诞生于 **Web 时代**，最初用于网页交互，如今已成为 **全栈开发** 的核心语言，应用于**前端、后端、桌面应用、移动端、游戏开发**等多个领域，仍在持续进化。
 

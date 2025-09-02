@@ -2,209 +2,11 @@ https://developer.aliyun.com/article/700302
 
 # ES6（2015）
 
-## 声明与表达式
-
-### let & const
-
-默认使用 const，只有当确实需要改变变量的值的时候才使用 `let`，这是因为大部分的变量的值在初始化后不应再改变，而预料之外的变量的修改是很多 bug 的源头。
-
-let & const 引起 **块级作用域**，在ES6之前，只存在两种作用域，即：**全局作用域** 和 **函数作用域** *（Eval作用域不算）*。
-
-let & const 不会引起变量提升，会有 **暂时性死区**（TDZ，**T**emporal **D**ead **Z**one，指在使用 let 或 const 声明变量时，在变量声明之前访问该变量会引发错误的行为 ），暂时性死区的存在是为了避免在变量未初始化之前意外地使用它们，这有助于减少由于变量提升和作用域问题而导致的错误。
-
-说到暂时性死区就要说到代码执行过程，分两个阶段：
-
-1. 编译阶段：编译器将js代码编译成可执行代码；
-2. 执行阶段：执行代码，执行上下文在这个阶段全部创建完成。
-
-在通过语法分析，确认语法无误之后，编译阶段会对变量的内存空间进行分配，**变量提升** 就是在此阶段完成的。那我们刚刚提到的 **暂时性死区** 其实就与 **变量提升** 有关，看如下代码：
-
-```js
-function foo() {
-  console.log(bar);
-  var bar = 3;
-}
-foo();
-```
-
-会输出：`undefined` ，原因是变量 bar 在函数内进行了提升，相当于：
-
-```js
-function foo() {
-  var bar;
-  console.log(bar);
-  bar = 3;
-}
-foo();
-```
-
-> **提示：**这是在编译阶段执行的 “伪代码”，当 `foo()` 执行时，就是第二阶段，执行代码。
-
-现在我们使用 `let` 关键字声明：
-
-```js
-function foo() {
-  console.log(bar);
-  let bar = 3;
-}
-foo();
-```
-
-会报错：ReferenceError: Cannot access 'bar' before initialization
-
-我们知道使用 let & const 声明变量，会针对这个变量形成一个封闭的 **块级作用域**，在这个块级作用域当中，如果在声明变量前访问该变量，就会报 `referenceError` 错误；如果在声明变量后访问，则可以正常获取变量值：
-
-```js
-function foo() {
-  let bar = 3;
-  console.log(bar);
-}
-foo();
-```
-
-正常输出 3。因此在相应花括号形成的作用域中，存在一个“**死区**”，起始于函数开头，终止与相关变量声明的一行。在这个范围内无法访问 let & const 声明的变量。这个“死区” 就是我们刚刚提到的 **暂时性死区**（TDZ，**T**emporal **D**ead **Z**one. ）
-
-结论：
-
-1. var 存在变量变量提升，let & const 不会（暂时性死区的原因）
-2. let & const 不能重复定义
-3. let & const 引起块级作用域
-
-### 变量解构
-
-ES6 允许按照一定模式，从数组和对象中提取值，对变量进行赋值，这被称为解构。
-
-#### 解构示例
-
-> a）解构数组
-
-```js
-const [id, name, skill] = [1, "李白", "青莲剑客"];
-console.log(id, name, skill); 
-```
-
-> b）解构对象
-
-```js
-const { name, address, job } = {
-  name: '张三',
-  job: '前端工程师',
-  address: '成都市高新区雅和南四路216号',
-};
-console.log(name, address, job);
-```
-
-> c）设置默认值
-
-```js
-const {
-  name = '张三',
-  address,
-  job,
-} = {
-  job: '前端工程师',
-  address: '成都市高新区雅和南四路216号',
-};
-console.log(name, address, job);
-```
-
-> d）解构字符串
-
-```javascript
-const [a, b, c, d, e] = 'CHINA';
-console.log(a, b, c, d, e);
-// C H I N A
-```
-
-#### 用途
-
-> a）交换值
-
-```javascript
-const x = 10, y = 20;
-[x, y] = [y, x];
-```
-
-> b）函数返回值
-
-```js
-function conditions() {
-  const min = 18, max = 50;
-  return { min, max };
-}
-```
-
-> c）函数参数
-
-```javascript
-function sum([a, b]) {
-  return a + b;
-}
-```
-
-> d）提取JSON数据
-
-解构赋值对提取 `JSON` 对象中的数据，尤其有用。
-
-```javascript
-const json = {
-  code: '0',
-  data: {
-    name: '张三',
-    job: '前端工程师',
-  },
-};
-const { code, data } = json;
-```
-
-### Symbol
-
-Symbol 是一种原始数据类型，它的主要作用是创建具有唯一性的标识符。
-
-Symbol 的使用场景包括但不限于以下几个方面：
-
-1. **创建对象的唯一属性名**：Symbol 可以用作对象属性的唯一标识符，避免属性名冲突的问题。通过使用 Symbol 作为属性名，可以确保属性的唯一性，不会被意外覆盖或冲突。
-
-   ```js
-   const id = Symbol('id');
-   const obj = {
-     [id]: '12345'
-   };
-   ```
-
-2. **防止属性被意外访问**：通过使用 Symbol 创建对象的私有属性或方法，可以避免其他代码意外地访问或修改它们。因为 Symbol 创建的属性在常规的对象迭代中是不可枚举的。
-
-   ```js
-   const _privateMethod = Symbol('privateMethod');
-   class MyClass {
-     [_privateMethod]() {
-       // 私有方法的实现
-     }
-   }
-   ```
-
-3. **定义常量**：由于每个 Symbol 都是唯一的，可以将 Symbol 用作常量值，确保不会与其他值产生冲突。
-
-   ```js
-   const LOG_LEVEL = {
-     DEBUG: Symbol('debug'),
-     INFO: Symbol('info'),
-     ERROR: Symbol('error')
-   };
-   ```
-
-4. **使用 Symbol 内置值**：ES6 还提供了一些内置的 Symbol 值，如 `Symbol.iterator`、`Symbol.toStringTag`、`Symbol.hasInstance` 等，可以用于自定义对象的行为和特性。
-
-   ```js
-   const obj = {
-     [Symbol.toStringTag]: 'MyObject'
-   };
-   console.log(obj.toString());  // 输出：[object MyObject]
-   ```
-
-需要注意的是，由于 Symbol 创建的属性是不可枚举的，因此无法使用常规的方式遍历对象的 Symbol 属性。可以使用 `Object.getOwnPropertySymbols()` 方法获取对象的 Symbol 属性列表。
-
-Symbol 的使用场景主要涉及 **对象属性的唯一性和私有性**，**以及自定义对象行为的扩展性**。通过合理使用 Symbol，可以更好地组织和保护代码，避免命名冲突和属性暴露的问题。
+-  `let` / `const` / 块级作用域
+- Symbol
+- 解构
+- 新增 Map、WeakMap、Set、WeakSet
+- 
 
 ## 内置对象
 
@@ -543,41 +345,21 @@ person.age = 30;
 
 在上述示例中，`createObservable` 函数返回一个代理对象，当设置属性时会调用 `onChange` 回调函数，并将属性名称和新值作为参数传递给它。该示例仅用于演示目的，实际应用中可能需要更复杂的逻辑来处理观察者列表的添加和删除，以及通知机制的实现。
 
-### 字符串
+- 数值，新增APIs
+  - [Number.parseInt()](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Number/parseint)
+  - [Number.parseFloat()](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Number/parseFloat)
 
-#### 模板字符串
-
-模板字面量（Template Literals）：使用反引号（\`）包围字符串，可以在字符串中插入变量或表达式，通过 `${}` 来引用。这使得字符串拼接更加简洁和可读。
-
-```javascript
-const name = 'John';
-const message = `Hello, ${name}!`;
-```
-
-> 提示：
->
-> 1、模板字符串中嵌入变量使用 `${}`，`${}` 中可以是变量或表达式。
->
-> 2、如果使用模板字符串表示多行字符串，所有的空格、缩进和换行都会保留在输出之中。
-
-#### 新增APIs
-
-- [String.prototype.includes()](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/String/includes)
-- [String.prototype.startsWith()](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/String/startsWith)
-- [String.prototype.endsWith()](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/String/endsWith)
-- [String.prototype.repeat()](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/String/repeat)
-- [String.prototype.padStart()](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/String/padStart)
-- [String.prototype.padEnd()](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/String/padEnd)
-
-### 数值
-
-#### Number 
-
-- [Number.parseInt()](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Number/parseint)
-- [Number.parseFloat()](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Number/parseFloat)
-
-- [Number.isNaN()](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Number/isNaN)
-- [Number.isInteger()](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Number/isInteger)
+  - [Number.isNaN()](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Number/isNaN)
+  - [Number.isInteger()](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Number/isInteger)
+- 字符串
+  - 模板字符串
+  - 新增APIs
+    - [String.prototype.includes()](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/String/includes)
+    - [String.prototype.startsWith()](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/String/startsWith)
+    - [String.prototype.endsWith()](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/String/endsWith)
+    - [String.prototype.repeat()](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/String/repeat)
+    - [String.prototype.padStart()](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/String/padStart)
+    - [String.prototype.padEnd()](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/String/padEnd)
 
 #### Math
 
@@ -1572,7 +1354,7 @@ for (const [k, v] of Object.entries(obj)) {
  */
 ```
 
-## String padding
+## `String padding`
 
 在 ES8 中 String 新增了两个实例函数 `String.prototype.padStart` 和 `String.prototype.padEnd`，允许将空字符串或其他字符串添加到原始字符串的开头或结尾。语法形式如下：
 
